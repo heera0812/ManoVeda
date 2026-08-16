@@ -1,0 +1,251 @@
+{
+  "profile": {
+    "name": "Dipesh",
+    "gender": "male",
+    "theme": "blue",
+    "ageRange": "19-21",
+    "completedOnboarding": false,
+    "baseline": {
+      "overallMood": "Good",
+      "stress": "Moderate",
+      "energy": "Moderate",
+      "sleep": "Okay",
+      "socialConnection": "Connected",
+      "academicPressure": "High",
+      "mainConcerns": [
+        "Studies",
+        "Career/future",
+        "Sleep",
+        "Stress"
+      ],
+      "previousExperience": "Used mindfulness apps before",
+      "createdAt": "2026-08-01"
+    },
+    "notificationFrequency": "few_times_week",
+    "quietHoursEnabled": true,
+    "quietHoursStart": "23:00",
+    "quietHoursEnd": "08:00",
+    "privacy": {
+      "shareMoodByDefault": false,
+      "anonymousCampusAnalytics": true,
+      "encryptedLocalOnly": true
+    }
+  },
+  "checkInsCount": 13,
+  "checkIns": [
+    {
+      "id": "seed-checkin-0",
+      "timestamp": 1785741881681,
+      "dateStr": "2026-08-03",
+      "dayLabel": "Mon, Aug 3",
+      "mood": 5,
+      "moodLabel": "Good",
+      "factors": [
+        "Academics",
+        "Sleep"
+      ],
+      "energy": 4,
+      "sleep": 4,
+      "journalText": "Felt good after finishing the lab assignment early.",
+      "journalPrompt": "What's one thing that happened today?"
+    },
+    {
+      "id": "seed-checkin-1",
+      "timestamp": 1785828281681,
+      "dateStr": "2026-08-04",
+      "dayLabel": "Tue, Aug 4",
+      "mood": 5,
+      "moodLabel": "Good",
+      "factors": [
+        "Friends",
+        "Health/wellbeing"
+      ],
+      "energy": 4,
+      "sleep": 5,
+      "journalText": "Had lunch with study group outside.",
+      "journalPrompt": "One moment from today you'd like to acknowledge:"
+    },
+    {
+      "id": "seed-checkin-2",
+      "timestamp": 1785914681681,
+      "dateStr": "2026-08-05",
+      "dayLabel": "Wed, Aug 5",
+      "mood": 4,
+      "moodLabel": "Okay",
+      "factors": [
+        "Academics",
+        "Stress"
+      ],
+      "energy": 3,
+      "sleep": 3,
+      "journalText": "Long lecture block, feeling a bit sluggish.",
+      "journalPrompt": "A thought that's been lingering in your mind..."
+    },
+    {
+      "id": "seed-checkin-3",
+      "timestamp": 1786001081681,
+      "dateStr": "2026-08-06",
+      "dayLabel": "Thu, Aug 6",
+      "mood": 6,
+      "moodLabel": "Great",
+      "factors": [
+        "Academics",
+        "Friends"
+      ],
+      "energy": 5,
+      "sleep": 4,
+      "journalText": "Got an A on the midterm project! Celebrated with coffee.",
+      "journalPrompt": "What's making today feel good?"
+    },
+    {
+      "id": "seed-checkin-4",
+      "timestamp": 1786087481681,
+      "dateStr": "2026-08-07",
+      "dayLabel": "Fri, Aug 7",
+      "mood": 4,
+      "moodLabel": "Okay",
+      "factors": [
+        "Sleep",
+        "Nothing specific"
+      ],
+      "energy": 3,
+      "sleep": 3,
+      "journalText": "",
+      "journalPrompt": ""
+    },
+    {
+      "id": "seed-checkin-5",
+      "timestamp": 1786173881681,
+      "dateStr": "2026-08-08",
+      "dayLabel": "Sat, Aug 8",
+      "mood": 3,
+      "moodLabel": "Not great",
+      "factors": [
+        "Academics",
+        "Stress",
+        "Sleep"
+      ],
+      "energy": 2,
+      "sleep": 2,
+      "journalText": "Didn't sleep well before the group presentation.",
+      "journalPrompt": "What's one thing that happened today?"
+    },
+    {
+      "id": "seed-checkin-6",
+      "timestamp": 1786260281681,
+      "dateStr": "2026-08-09",
+      "dayLabel": "Sun, Aug 9",
+      "mood": 3,
+      "moodLabel": "Not great",
+      "factors": [
+        "Academics",
+        "Career",
+        "Stress"
+      ],
+      "energy": 2,
+      "sleep": 3,
+      "journalText": "Internship deadlines are piling up alongside problem sets.",
+      "journalPrompt": "What would feel comforting or helpful right now?"
+    },
+    {
+      "id": "seed-checkin-7",
+      "timestamp": 1786346681681,
+      "dateStr": "2026-08-10",
+      "dayLabel": "Mon, Aug 10",
+      "mood": 4,
+      "moodLabel": "Okay",
+      "factors": [
+        "Relationships",
+        "Sleep"
+      ],
+      "energy": 3,
+      "sleep": 3,
+      "journalText": "Talked with family over the weekend. Reset a bit.",
+      "journalPrompt": "A thought that's been lingering in your mind..."
+    },
+    {
+      "id": "seed-checkin-8",
+      "timestamp": 1786433081681,
+      "dateStr": "2026-08-11",
+      "dayLabel": "Tue, Aug 11",
+      "mood": 5,
+      "moodLabel": "Good",
+      "factors": [
+        "Health/wellbeing",
+        "Friends"
+      ],
+      "energy": 4,
+      "sleep": 4,
+      "journalText": "Went for a 20-minute walk between classes.",
+      "journalPrompt": "What's making today feel good?"
+    },
+    {
+      "id": "seed-checkin-9",
+      "timestamp": 1786519481681,
+      "dateStr": "2026-08-12",
+      "dayLabel": "Wed, Aug 12",
+      "mood": 3,
+      "moodLabel": "Not great",
+      "factors": [
+        "Academics",
+        "Sleep",
+        "Stress"
+      ],
+      "energy": 2,
+      "sleep": 2,
+      "journalText": "Stayed up until 2am finishing revisions.",
+      "journalPrompt": "What is something your mind is holding onto right now?"
+    },
+    {
+      "id": "seed-checkin-10",
+      "timestamp": 1786605881681,
+      "dateStr": "2026-08-13",
+      "dayLabel": "Thu, Aug 13",
+      "mood": 2,
+      "moodLabel": "Low",
+      "factors": [
+        "Academics",
+        "Stress",
+        "Loneliness"
+      ],
+      "energy": 2,
+      "sleep": 2,
+      "journalText": "Heavy brain fog today. Felt disconnected during seminar.",
+      "journalPrompt": "What would feel comforting or helpful right now?"
+    },
+    {
+      "id": "seed-checkin-11",
+      "timestamp": 1786692281681,
+      "dateStr": "2026-08-14",
+      "dayLabel": "Fri, Aug 14",
+      "mood": 3,
+      "moodLabel": "Not great",
+      "factors": [
+        "Academics",
+        "Career"
+      ],
+      "energy": 3,
+      "sleep": 3,
+      "journalText": "Met with academic advisor. Feeling slightly clearer on course path.",
+      "journalPrompt": "One moment from today you'd like to acknowledge:"
+    },
+    {
+      "id": "seed-checkin-12",
+      "timestamp": 1786778681681,
+      "dateStr": "2026-08-15",
+      "dayLabel": "Sat, Aug 15",
+      "mood": 4,
+      "moodLabel": "Okay",
+      "factors": [
+        "Sleep",
+        "Health/wellbeing"
+      ],
+      "energy": 3,
+      "sleep": 4,
+      "journalText": "Got 8 hours of sleep last night. Noticeably calmer.",
+      "journalPrompt": "What's one thing that happened today?"
+    }
+  ],
+  "exportedAt": "2026-08-16T09:11:35.051Z",
+  "app": "ManoVeda Campus Student Wellness"
+}

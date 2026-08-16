@@ -1,0 +1,6 @@
+{
+  "name": "ManoVeda",
+  "description": "A calm, student-centered mental wellness web application for quick daily mood check-ins, pattern discovery, micro-exercises, and confidential campus counseling support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

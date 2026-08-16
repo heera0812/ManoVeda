@@ -1,0 +1,12 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Chatbot backend
+mental-health-chatbot/mental-health-chatbot/backend/.env
+mental-health-chatbot/mental-health-chatbot/backend/__pycache__/
