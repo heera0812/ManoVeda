@@ -608,4 +608,4 @@ def health():
 if __name__ == "__main__":
     # use_reloader=False avoids the debug reloader spinning up two processes
     # (which would otherwise split your in-memory SESSIONS dict in two)
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+    app.run(host="0.0.0.0", port=5555, debug=True, use_reloader=False)

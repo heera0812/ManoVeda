@@ -4,7 +4,7 @@ import { X, Send, Mic, MicOff, Brain, MessageCircle, Loader2 } from 'lucide-reac
 import { motion, AnimatePresence } from 'framer-motion';
 
 // The Flask chatbot backend URL — change this when deployed
-const CHATBOT_API = 'http://localhost:5000';
+const CHATBOT_API = 'http://localhost:5555';
 
 interface ChatMessage {
   id: string;
