@@ -1,0 +1,69 @@
+<!--
+  Wellness Check-in Chatbot — embeddable widget markup.
+  Copy this whole <div class="aria-widget">...</div> block into any page
+  on your site, then include chatbot.css and chatbot.js (see index.html
+  for a full working example).
+-->
+
+<div class="aria-widget">
+
+  <!-- Chat card -->
+  <div class="aria-card" id="ariaChatCard">
+    <div class="aria-header">
+      <div class="aria-avatar">🌿</div>
+      <div class="aria-header-text">
+        <h3>Aria — Wellness Check-in</h3>
+        <p>A private, judgment-free space</p>
+      </div>
+      <div class="aria-progress" id="ariaProgress">Getting ready…</div>
+    </div>
+
+    <div class="aria-messages" id="ariaMessages"></div>
+
+    <div class="aria-footer">
+      <button class="aria-mic-btn" id="ariaMicBtn" disabled title="Tap to speak">
+        🎙️
+      </button>
+      <div class="aria-status" id="ariaStatus">Loading Aria…</div>
+    </div>
+
+    <div class="aria-disclaimer">
+      This check-in is not a diagnosis and Aria is not a substitute for
+      professional care. If you're in crisis or in danger, please contact
+      your local emergency number or a crisis helpline right away.
+    </div>
+  </div>
+
+  <!-- Results card (hidden until the assessment is ready) -->
+  <div class="aria-results" id="ariaResults">
+    <div style="font-size:34px;">🌱</div>
+    <h3>Thanks for checking in</h3>
+    <p class="aria-sub">Here's a quick summary of what you shared</p>
+
+    <div class="aria-badges">
+      <div class="aria-badge">
+        <div class="label">Mood</div>
+        <div class="value" id="badgeMood">—</div>
+      </div>
+      <div class="aria-badge">
+        <div class="label">Stress</div>
+        <div class="value" id="badgeStress">—</div>
+      </div>
+      <div class="aria-badge">
+        <div class="label">Anxiety</div>
+        <div class="value" id="badgeAnxiety">—</div>
+      </div>
+      <div class="aria-badge">
+        <div class="label">Counseling</div>
+        <div class="value" id="badgeCounseling">—</div>
+      </div>
+    </div>
+
+    <div id="ariaBookingPrompt" class="aria-hidden">
+      <button class="aria-book-btn" id="ariaBookBtn">Book a Counseling Session →</button>
+    </div>
+
+    <button class="aria-restart-btn" id="ariaRestartBtn">Start a new check-in</button>
+  </div>
+
+</div>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wellness Check-in — Demo</title>
+  <link rel="stylesheet" href="chatbot.css" />
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+      background: linear-gradient(160deg, #eef4f2 0%, #dfe9ec 100%);
+      font-family: "Segoe UI", sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="brand">🌿 Aria Wellness</div>
+      <nav class="site-nav">
+        <a href="#booking">Booking</a>
+        <a href="#support">Support</a>
+        <a href="#resources">Resources</a>
+      </nav>
+    </header>
+
+    <main class="site-main">
+      <section class="hero-section">
+        <div class="hero-copy">
+          <span class="eyebrow">Mental wellness support</span>
+          <h1>Check in with yourself before stress takes over.</h1>
+          <p>
+            Private, gentle, and judgment-free guidance for understanding your mood,
+            stress, and anxiety with supportive next steps.
+          </p>
+          <div class="hero-actions">
+            <a href="#booking" class="primary-btn">Book a session</a>
+            <a href="#support" class="secondary-btn">Learn more</a>
+          </div>
+        </div>
+
+        <div class="widget-wrap">
+          <div class="aria-widget">
+            <div class="aria-card" id="ariaChatCard">
+              <div class="aria-header">
+                <div class="aria-avatar">🌿</div>
+                <div class="aria-header-text">
+                  <h3>Aria — Wellness Check-in</h3>
+                  <p>A private, judgment-free space</p>
+                </div>
+                <div class="aria-progress" id="ariaProgress">Getting ready…</div>
+              </div>
+
+              <div class="aria-messages" id="ariaMessages"></div>
+
+              <div class="aria-footer">
+                <button class="aria-mic-btn" id="ariaMicBtn" disabled title="Tap to speak">
+                  🎙️
+                </button>
+
+                <div class="aria-text-entry">
+                  <input
+                    id="ariaTextInput"
+                    type="text"
+                    placeholder="Type your message here..."
+                    aria-label="Type your message"
+                  />
+                  <button id="ariaSendTextBtn" type="button">Send</button>
+                </div>
+
+                <div class="aria-status" id="ariaStatus">Loading Aria…</div>
+              </div>
+
+              <div class="aria-disclaimer">
+                This check-in is not a diagnosis and Aria is not a substitute for
+                professional care. Please reach out to a licensed mental health professional if you are in need of support.
+              </div>
+            </div>
+
+            <div class="aria-results" id="ariaResults">
+              <div style="font-size:34px;">🌱</div>
+              <h3>Thanks for checking in</h3>
+              <p class="aria-sub">Here's a quick summary of what you shared</p>
+
+              <div class="aria-badges">
+                <div class="aria-badge">
+                  <div class="label">Mood</div>
+                  <div class="value" id="badgeMood">—</div>
+                </div>
+                <div class="aria-badge">
+                  <div class="label">Stress</div>
+                  <div class="value" id="badgeStress">—</div>
+                </div>
+                <div class="aria-badge">
+                  <div class="label">Depression</div>
+                  <div class="value" id="badgeDepression">—</div>
+                </div>
+                <div class="aria-badge">
+                  <div class="label">Anxiety</div>
+                  <div class="value" id="badgeAnxiety">—</div>
+                </div>
+                <div class="aria-badge">
+                  <div class="label">Wellness</div>
+                  <div class="value" id="badgeWellness">—</div>
+                </div>
+                <div class="aria-badge">
+                  <div class="label">Counseling</div>
+                  <div class="value" id="badgeCounseling">—</div>
+                </div>
+              </div>
+
+              <p id="ariaCounselorNote" class="aria-counselor-note">
+                If you want to know more about yourself, connect with a counselor.
+              </p>
+
+              <div id="ariaBookingPrompt" class="aria-hidden">
+                <button class="aria-book-btn" id="ariaBookBtn">Book a Counseling Session →</button>
+              </div>
+
+              <button class="aria-restart-btn" id="ariaRestartBtn">Start a new check-in</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="game-container" style="text-align: center; font-family: sans-serif; background: #f0f4f8; padding: 20px; border-radius: 12px;">
+    <h3>✨ Mind Reset Particle Focus</h3>
+    <p>Gently click the drifting bubbles to anchor your awareness. Breathe out slowly.</p>
+    <canvas id="gameCanvas" width="400" height="300" style="background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer;"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + 20;
+        this.size = Math.random() * 15 + 10;
+        this.speed = Math.random() * 0.8 + 0.3;
+        this.alpha = 0.6;
+    }
+    update() {
+        this.y -= this.speed;
+        if (this.y < -20) { this.y = canvas.height + 20; this.x = Math.random() * canvas.width; }
+    }
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = '#a3b18a';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+// Initialize particles
+for(let i=0; i<12; i++) { particles.push(new Particle()); }
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animate);
+}
+animate();
+
+// Pop on click
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    particles.forEach((p, index) => {
+        const dist = Math.hypot(p.x - mouseX, p.y - mouseY);
+        if (dist < p.size) {
+            // Instantly reset popped particle to the bottom with a new position
+            particles[index] = new Particle();
+        }
+    });
+});
+</script>
+
+
+      <section class="feature-grid" id="support">
+        <div class="feature-box">
+          <h3>Private</h3>
+          <p>Thoughtful reflection in a calm, judgment-free environment.</p>
+        </div>
+        <div class="feature-box">
+          <h3>Guided</h3>
+          <p>Simple prompts that help you notice patterns and feel heard.</p>
+        </div>
+        <div class="feature-box">
+          <h3>Actionable</h3>
+          <p>Supportive next steps and booking options when you need more help.</p>
+        </div>
+      </section>
+
+      <section class="booking-section" id="booking">
+        <div class="booking-head">
+          <h2>Book your support session</h2>
+          <span class="tag">Virtual &amp; in-person</span>
+        </div>
+
+        <div class="booking-layout">
+          <div class="booking-panel">
+            <h3>What to expect</h3>
+            <ul>
+              <li>Warm, evidence-informed counseling support</li>
+              <li>Flexible appointments across the week</li>
+              <li>Confidential care tailored to your goals</li>
+            </ul>
+          </div>
+
+          <form class="booking-form">
+            <label>
+              Full name
+              <input type="text" placeholder="Your name" />
+            </label>
+            <label>
+              Email
+              <input type="email" placeholder="you@example.com" />
+            </label>
+            <label>
+              Session type
+              <select>
+                <option>Initial Consultation</option>
+                <option>Individual Counseling</option>
+                <option>Virtual Session</option>
+                <option>Follow-up</option>
+              </select>
+            </label>
+            <label>
+              Message
+              <textarea placeholder="I’d like support with stress and sleep."></textarea>
+            </label>
+            <button type="submit">Request appointment</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="chatbot.js"></script>
+</body>
+</html>
