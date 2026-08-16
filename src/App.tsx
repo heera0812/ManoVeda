@@ -299,16 +299,20 @@ export default function App() {
 
       {/* Main App Route */}
       <Route path="/" element={
-        !user && !userProfile.completedOnboarding ? (
-          <OnboardingFlow
-            onComplete={profile => {
-              setUserProfile(profile);
-              navigate('/signup');
-            }}
-            onQuickDemoLogin={() => {
-              navigate('/login');
-            }} // Legacy
-          />
+        !user ? (
+          !userProfile.completedOnboarding ? (
+            <OnboardingFlow
+              onComplete={profile => {
+                setUserProfile(profile);
+                navigate('/signup');
+              }}
+              onQuickDemoLogin={() => {
+                navigate('/login');
+              }} // Legacy
+            />
+          ) : (
+            <AuthGatePage />
+          )
         ) : (
           <div className={`min-h-screen ${currentTheme.bgGradient} transition-colors duration-500 flex flex-col lg:flex-row relative text-slate-900 font-sans`}>
               {/* Dashboard Content */}
