@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Loader2 } from 'lucide-react';
-import { supabase, usernameToEmail } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,20 +13,18 @@ export const LoginPage: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password) return;
+    if (!username.trim() || !password) return;
 
     setLoading(true);
     setError('');
 
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: usernameToEmail(username),
-        password,
-      });
-
-      if (authError) throw authError;
-
-      navigate('/'); // Redirect to dashboard
+      const res = await signIn(username, password);
+      if (res.error) {
+        setError(res.error);
+      } else {
+        navigate('/'); // Redirect to dashboard
+      }
     } catch (err: any) {
       console.error(err);
       setError('Invalid username or password');

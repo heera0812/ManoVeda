@@ -13,6 +13,7 @@ import {
 import { ActiveTab, Booking, CheckInRecord, MicroExercise, PatternObservation, UserProfile, WeeklyReflection } from '../types';
 import { getLocalDateKey } from '../utils/date';
 import { THEMES } from '../utils/theme';
+import { MOOD_CONFIGS } from '../constants/moods';
 import { QuestionnaireModal } from './QuestionnaireModal';
 import { DashboardRobot } from './DashboardRobot';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -291,7 +292,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                   <div key={i} className="flex flex-col items-center gap-2">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all bg-slate-50 border border-slate-100">
                       {slot.match ? (
-                        <span className="text-lg">{slot.match.emoji || '✨'}</span>
+                        <span className="text-lg">{MOOD_CONFIGS[slot.match.mood]?.emoji || '✨'}</span>
                       ) : (
                         <span className="text-slate-300 text-xs">—</span>
                       )}

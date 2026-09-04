@@ -38,16 +38,28 @@ export const GlobalChatModal: React.FC<GlobalChatModalProps> = ({ isOpen, onClos
     const fetchMessages = async () => {
       setLoading(true);
       const fiveHoursAgo = new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString();
-      const { data, error } = await supabase
-        .from('global_chat')
-        .select('*')
-        .gte('created_at', fiveHoursAgo)
-        .order('created_at', { ascending: true });
+      try {
+        const { data, error } = await Promise.race([
+          supabase
+            .from('global_chat')
+            .select('*')
+            .gte('created_at', fiveHoursAgo)
+            .order('created_at', { ascending: true }),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Chat timeout')), 2500))
+        ]);
 
-      if (!error && data) {
-        setMessages(data);
+        if (!error && data && data.length > 0) {
+          setMessages(data);
+        } else {
+          const stored = localStorage.getItem('manoveda_local_chat');
+          if (stored) setMessages(JSON.parse(stored));
+        }
+      } catch {
+        const stored = localStorage.getItem('manoveda_local_chat');
+        if (stored) setMessages(JSON.parse(stored));
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchMessages();
@@ -57,29 +69,35 @@ export const GlobalChatModal: React.FC<GlobalChatModalProps> = ({ isOpen, onClos
   useEffect(() => {
     if (!isOpen) return;
 
-    const channel = supabase
-      .channel('global_chat_realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'global_chat',
-        },
-        (payload) => {
-          const newMsg = payload.new as ChatMessage;
-          setMessages(prev => {
-            // Avoid duplicates
-            if (prev.some(m => m.id === newMsg.id)) return prev;
-            return [...prev, newMsg];
-          });
-        }
-      )
-      .subscribe();
+    try {
+      const channel = supabase
+        .channel('global_chat_realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'global_chat',
+          },
+          (payload) => {
+            const newMsg = payload.new as ChatMessage;
+            setMessages(prev => {
+              // Avoid duplicates
+              if (prev.some(m => m.id === newMsg.id)) return prev;
+              return [...prev, newMsg];
+            });
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      return () => {
+        try {
+          supabase.removeChannel(channel);
+        } catch {}
+      };
+    } catch {
+      // Ignore websocket connection error if Supabase is unreachable
+    }
   }, [isOpen]);
 
   // Scroll to bottom when new messages arrive
@@ -99,18 +117,40 @@ export const GlobalChatModal: React.FC<GlobalChatModalProps> = ({ isOpen, onClos
     if (!newMessage.trim() || !user || sending) return;
 
     const username = profile?.username || 'Anonymous';
+    const text = newMessage.trim();
     setSending(true);
 
-    const { error } = await supabase.from('global_chat').insert({
+    const localMsg: ChatMessage = {
+      id: 'local_msg_' + Date.now(),
       user_id: user.id,
       username,
-      message: newMessage.trim(),
-    });
+      message: text,
+      created_at: new Date().toISOString()
+    };
 
-    if (!error) {
+    try {
+      const { error } = await Promise.race([
+        supabase.from('global_chat').insert({
+          user_id: user.id,
+          username,
+          message: text,
+        }),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Send timeout')), 2500))
+      ]);
+
+      if (error) throw error;
       setNewMessage('');
+    } catch {
+      // Local fallback
+      setMessages(prev => {
+        const updated = [...prev, localMsg];
+        localStorage.setItem('manoveda_local_chat', JSON.stringify(updated));
+        return updated;
+      });
+      setNewMessage('');
+    } finally {
+      setSending(false);
     }
-    setSending(false);
   };
 
   const formatTime = (dateStr: string) => {

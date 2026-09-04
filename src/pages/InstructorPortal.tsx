@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
 export const InstructorPortal: React.FC = () => {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, signIn, signOut } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,13 +18,10 @@ export const InstructorPortal: React.FC = () => {
     setError('');
 
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (authError) throw authError;
-      // Note: We check if they are actually an instructor in the effect below
+      const res = await signIn(email, password);
+      if (res.error) {
+        setError(res.error);
+      }
     } catch (err: any) {
       setError('Invalid instructor credentials');
     } finally {
@@ -44,7 +41,7 @@ export const InstructorPortal: React.FC = () => {
             <p className="text-[#666666]">Welcome back, {profile.username}</p>
           </div>
           <button 
-            onClick={() => supabase.auth.signOut()}
+            onClick={() => signOut()}
             className="text-sm font-bold text-[#666666] hover:text-[#325343]"
           >
             Log out

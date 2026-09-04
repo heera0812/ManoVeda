@@ -17,6 +17,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Booking, Counselor, UserProfile } from '../types';
+import { COUNSELORS_DATA } from '../constants/counselors';
 import { THEMES } from '../utils/theme';
 import { supabase } from '../lib/supabase';
 
@@ -66,15 +67,18 @@ export const CounselingView: React.FC<CounselingViewProps> = ({
   useEffect(() => {
     const fetchInstructors = async () => {
       try {
-        const { data, error } = await supabase
-          .from('instructors')
-          .select('*')
-          .eq('is_active', true)
-          .order('created_at', { ascending: false });
+        const { data, error } = await Promise.race([
+          supabase
+            .from('instructors')
+            .select('*')
+            .eq('is_active', true)
+            .order('created_at', { ascending: false }),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Instructors timeout')), 2500))
+        ]);
 
         if (error) throw error;
 
-        if (data) {
+        if (data && data.length > 0) {
           const mappedCounselors: Counselor[] = data.map(inst => ({
             id: inst.id,
             name: inst.name,
@@ -92,11 +96,16 @@ export const CounselingView: React.FC<CounselingViewProps> = ({
             badge: 'Instructor',
             experienceYears: 5,
             intro: inst.description || 'Dedicated to supporting your wellness journey.',
+            sessionTypes: ['In-Person Wellness Center', 'Secure Video Call'],
+            approach: 'Evidence-based cognitive and holistic mental wellness strategies.'
           }));
           setCounselors(mappedCounselors);
+        } else {
+          setCounselors(COUNSELORS_DATA);
         }
       } catch (error) {
-        console.error('Error fetching instructors:', error);
+        console.warn('Using default counselors due to network/Supabase state:', error);
+        setCounselors(COUNSELORS_DATA);
       } finally {
         setLoadingCounselors(false);
       }

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Loader2 } from 'lucide-react';
-import { supabase, usernameToEmail } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,7 +13,7 @@ export const SignupPage: React.FC = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.length < 3) {
+    if (username.trim().length < 3) {
       setError('Username must be at least 3 characters');
       return;
     }
@@ -25,30 +26,15 @@ export const SignupPage: React.FC = () => {
     setError('');
 
     try {
-      // Create user in Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: usernameToEmail(username),
-        password,
-      });
-
-      if (authError) throw authError;
-
-      // Create profile record
-      if (authData.user) {
-        const { error: profileError } = await supabase.from('profiles').insert([
-          {
-            id: authData.user.id,
-            username: username.trim(),
-            role: 'student',
-          },
-        ]);
-        if (profileError) throw profileError;
+      const res = await signUp(username, password);
+      if (res.error) {
+        setError(res.error);
+      } else {
+        navigate('/'); // Redirect to dashboard
       }
-
-      navigate('/'); // Redirect to dashboard
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to sign up');
+      setError(err?.message || 'Failed to sign up');
     } finally {
       setLoading(false);
     }
