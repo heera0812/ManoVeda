@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Send, Mic, MicOff, Brain, MessageCircle, Loader2 } from 'lucide-react';
+import { X, Send, Mic, MicOff, Brain, MessageCircle, Loader2, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // The Flask chatbot backend URL — change this when deployed
@@ -36,6 +36,18 @@ export const AriaChatModal: React.FC<AriaChatModalProps> = ({ isOpen, onClose })
   const [assessment, setAssessment] = useState<AssessmentResult | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [progress, setProgress] = useState<string>('');
+  const [connectionError, setConnectionError] = useState(false);
+  const [isOfflineMode, setIsOfflineMode] = useState(false);
+  const [offlineStep, setOfflineStep] = useState(0);
+  const [offlineAnswers, setOfflineAnswers] = useState<string[]>([]);
+
+  const OFFLINE_QUESTIONS = [
+    "How has your overall mood and emotional energy been feeling lately?",
+    "How has your sleep quality and physical energy been holding up?",
+    "What is your current stress level regarding academics, workload, or daily expectations?",
+    "Have you felt overwhelmed, anxious, or down more often than usual in recent weeks?",
+    "Do you have someone you feel comfortable confiding in, or would campus counseling feel helpful right now?"
+  ];
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -65,8 +77,17 @@ export const AriaChatModal: React.FC<AriaChatModalProps> = ({ isOpen, onClose })
     setAssessment(null);
     setMessages([]);
     setMode(null);
+    setConnectionError(false);
+    setIsOfflineMode(false);
+    setOfflineStep(0);
+    setOfflineAnswers([]);
+    setProgress('');
+
     try {
-      const res = await fetch(`${CHATBOT_API}/api/start`, { method: 'POST' });
+      const res = await Promise.race([
+        fetch(`${CHATBOT_API}/api/start`, { method: 'POST' }),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Connection timeout')), 3500))
+      ]);
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
@@ -77,10 +98,25 @@ export const AriaChatModal: React.FC<AriaChatModalProps> = ({ isOpen, onClose })
       speakText(data.text);
     } catch (err) {
       console.error(err);
-      setMessages([{ id: 'err', sender: 'ai', text: 'Could not connect to Aria. Please make sure the chatbot server is running.' }]);
+      setConnectionError(true);
+      setMessages([{
+        id: 'err',
+        sender: 'ai',
+        text: 'Could not connect to the Aria chatbot server on port 5555. You can retry connecting or continue in Offline Wellness Mode.'
+      }]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const startOfflineMode = () => {
+    setConnectionError(false);
+    setIsOfflineMode(true);
+    setSessionId('offline_session_' + Date.now());
+    setMode('choice');
+    const greeting = "Hi! I am Aria, your wellness companion. While running locally, I'm here to support you. Would you like to have an open conversation about how you're feeling, or take a quick 5-question wellness check-in?";
+    setMessages([{ id: Date.now().toString(), sender: 'ai', text: greeting }]);
+    speakText(greeting);
   };
 
   // Auto-start session when opened
@@ -96,6 +132,35 @@ export const AriaChatModal: React.FC<AriaChatModalProps> = ({ isOpen, onClose })
     setSending(true);
     const userLabel = route === 'start-chat' ? 'Continue talking' : 'Take assessment';
     setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'user', text: userLabel }]);
+
+    if (isOfflineMode) {
+      setTimeout(() => {
+        if (route === 'start-chat') {
+          setMode('chat');
+          setProgress('Open Wellness Chat');
+          const aiMsg: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            sender: 'ai',
+            text: "I'm listening with an open heart. What's been on your mind lately, or how has your day felt so far?"
+          };
+          setMessages(prev => [...prev, aiMsg]);
+          speakText(aiMsg.text);
+        } else {
+          setMode('assessment');
+          setOfflineStep(0);
+          setProgress(`Question 1 of ${OFFLINE_QUESTIONS.length}`);
+          const aiMsg: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            sender: 'ai',
+            text: OFFLINE_QUESTIONS[0]
+          };
+          setMessages(prev => [...prev, aiMsg]);
+          speakText(aiMsg.text);
+        }
+        setSending(false);
+      }, 500);
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -152,6 +217,59 @@ export const AriaChatModal: React.FC<AriaChatModalProps> = ({ isOpen, onClose })
     setInputText('');
     setSending(true);
     setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'user', text: userText }]);
+
+    if (isOfflineMode) {
+      setTimeout(() => {
+        if (mode === 'chat') {
+          const lower = userText.toLowerCase();
+          let reply = "Thank you for sharing that with me. It takes courage to open up. What feels like the biggest weight on your shoulders right now?";
+          if (lower.includes('stress') || lower.includes('exam') || lower.includes('study') || lower.includes('pressure')) {
+            reply = "Academic and daily pressure can feel so heavy. Remember that your well-being comes first. Have you taken a short break or stepped away for fresh air today?";
+          } else if (lower.includes('sad') || lower.includes('down') || lower.includes('depress') || lower.includes('cry')) {
+            reply = "I hear you, and your feelings are completely valid. It is okay to feel down sometimes. You don't have to carry this alone — I'm right here with you.";
+          } else if (lower.includes('tired') || lower.includes('sleep') || lower.includes('exhaust')) {
+            reply = "Exhaustion is a gentle signal from your body asking for rest. What is one small, kind thing you can do for yourself tonight to help recharge?";
+          } else if (lower.includes('anxious') || lower.includes('panic') || lower.includes('worry')) {
+            reply = "When anxiety spikes, try a grounding 4-4-6 breath with me: breathe in for 4 seconds, pause for 4, and let it go slowly for 6. How does your chest feel?";
+          }
+          const aiMsg: ChatMessage = { id: (Date.now() + 1).toString(), sender: 'ai', text: reply };
+          setMessages(prev => [...prev, aiMsg]);
+          speakText(reply);
+        } else if (mode === 'assessment') {
+          const nextStep = offlineStep + 1;
+          const updatedAnswers = [...offlineAnswers, userText];
+          setOfflineAnswers(updatedAnswers);
+          setOfflineStep(nextStep);
+
+          if (nextStep < OFFLINE_QUESTIONS.length) {
+            setProgress(`Question ${nextStep + 1} of ${OFFLINE_QUESTIONS.length}`);
+            const aiMsg: ChatMessage = {
+              id: (Date.now() + 1).toString(),
+              sender: 'ai',
+              text: OFFLINE_QUESTIONS[nextStep]
+            };
+            setMessages(prev => [...prev, aiMsg]);
+            speakText(aiMsg.text);
+          } else {
+            // Completed assessment
+            setProgress('Assessment Complete');
+            const fullText = updatedAnswers.join(' ').toLowerCase();
+            const highRisk = fullText.includes('severe') || fullText.includes('can\'t cope') || fullText.includes('panic');
+            const modRisk = fullText.includes('stress') || fullText.includes('tired') || fullText.includes('anxious') || fullText.includes('hard');
+            setAssessment({
+              mood: highRisk ? 'Low' : modRisk ? 'Fair' : 'Balanced',
+              stress: highRisk ? 'High' : modRisk ? 'Moderate' : 'Manageable',
+              depression: highRisk ? 'Mild-Moderate' : 'Low',
+              anxiety: highRisk ? 'Elevated' : modRisk ? 'Moderate' : 'Mild',
+              wellness: highRisk ? 'Needs Care' : modRisk ? 'Fair' : 'Good',
+              counseling: (highRisk || modRisk) ? 'Yes' : 'Optional'
+            });
+          }
+        }
+        setSending(false);
+      }, 600);
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -394,6 +512,29 @@ export const AriaChatModal: React.FC<AriaChatModalProps> = ({ isOpen, onClose })
                       >
                         <Brain className="w-3.5 h-3.5" /> Take assessment
                       </button>
+                    </div>
+                  )}
+
+                  {/* Connection error action buttons */}
+                  {connectionError && (
+                    <div className="flex flex-col gap-2 p-3 bg-amber-50 border border-amber-200 rounded-2xl mx-1 my-2">
+                      <p className="text-[11px] text-amber-800 font-medium text-center">
+                        Backend server on port 5555 was not reached.
+                      </p>
+                      <div className="flex gap-2 justify-center">
+                        <button
+                          onClick={startSession}
+                          className="flex items-center gap-1.5 px-3 py-2 bg-[#325343] text-white rounded-xl text-xs font-bold hover:bg-[#264033] transition-colors shadow-xs"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" /> Retry Server
+                        </button>
+                        <button
+                          onClick={startOfflineMode}
+                          className="flex items-center gap-1.5 px-3 py-2 bg-white border border-[#325343] text-[#325343] rounded-xl text-xs font-bold hover:bg-[#325343]/5 transition-colors"
+                        >
+                          <Brain className="w-3.5 h-3.5" /> Offline Mode
+                        </button>
+                      </div>
                     </div>
                   )}
 
